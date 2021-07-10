@@ -71,6 +71,11 @@ class App:
   ]
 
   def __init__(self):
+    self.baud_rate = 115200
+    self.current_device = '_SERIAL_'
+    self.gui_queue = queue.Queue()
+    self.serial_commands = SerialCommands(self.baud_rate)
+    self.socket_commands = SocketCommands()
     self.window = sg.Window('', self.layout, size=(360, 430), keep_on_top=True)
 
     while True:
@@ -80,5 +85,46 @@ class App:
 
     self.window.close()
 
+  def start_collect_data(self, device, serialport, sample_num, gui_queue, stop_thread_trigger):
+    start_time = 0
+
+    if self.current_device == '_SERIAL_':
+      device.connect(serialport)
+
+    if device.is_connect():
+
+      n = 0
+      while n < sample_num:
+        try:
+          if stop_thread_trigger: break
+
+          data = device.get_data()
+
+          if data is not None:
+            if n == 0:
+              gui_queue.put('Data Transmitting ::: Wait!')
+              start_time = perf_counter()
+
+            if self.current_device == '_SERIAL_':
+              data = data.decode('utf-8')
+
+            if len(data.split(',')) > 0:
+              n += 1
+              percent = n / sample_num * 100
+              self.csv_writer('data', n, data)
+
+              if percent % 10 == 0:
+                gui_queue.put('Saving to CSV file: {}% complete'.format(int(percent)))
+
+        except OSError as error:
+          print(error)
+        except UnicodeDecodeError as error:
+          print(error)
+
+    device.disconnect()
+    time_taken = (perf_counter() - start_time)
+    sampling_rate = sample_num / time_taken
+    gui_queue.put('Sampling Rate: {} hz ::: Done!'.format(int(sampling_rate)))
+    return
 if __name__ == '__main__':
   App()
