@@ -1,0 +1,4 @@
+pyserial==3.5
+PySimpleGUI==4.45.0
+tk==0.1.0
+websocket-server==0.4
