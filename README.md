@@ -8,7 +8,7 @@ The module that allows the collection of data sampling, which is transmitted wit
 ## :movie_camera: Preview
 
 <div align="center">
-  <img src="" />
+  <img src="preview.gif" />
 </div>
 
 ## :rocket: Technologies
