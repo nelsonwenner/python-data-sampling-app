@@ -21,7 +21,7 @@ class SerialCommands:
     if not self.serial.isOpen():
       return None
     else:
-      return self.serial.readline()
+      return self.serial.readline().decode('utf-8')
 
   def disconnect(self):
     if self.serial is None:
