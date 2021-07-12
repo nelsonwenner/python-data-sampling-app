@@ -85,7 +85,6 @@ class App:
 
       if event == '_SERIAL_':
         self.window['_DEVICE_TITLE_'].update('Select your serial port')
-        self.window['_DEVICE_LIST_'].update(disabled=False)
         self.window['_SERIAL_'].update(True)
         self.window['_WIFI_'].update(False)
         self.current_device = '_SERIAL_'
@@ -180,30 +179,20 @@ class App:
       device.connect(serialport)
 
     if device.is_connect():
-
       n = 0
       while n < sample_num:
         try:
           if stop_thread_trigger: break
-
           data = device.get_data()
-
           if data is not None:
             if n == 0:
               gui_queue.put('Data Transmitting ::: Wait!')
               start_time = perf_counter()
-
-            if self.current_device == '_SERIAL_':
-              data = data.decode('utf-8')
-
-            if len(data.split(',')) > 0:
-              n += 1
-              percent = n / sample_num * 100
-              self.csv_writer('data', n, data)
-
-              if percent % 10 == 0:
-                gui_queue.put('Saving to CSV file: {}% complete'.format(int(percent)))
-
+            n += 1
+            percent = n / sample_num * 100
+            self.csv_writer('data', n, data)
+            if percent % 10 == 0:
+              gui_queue.put('Saving to CSV file: {}% complete'.format(int(percent)))
         except OSError as error:
           print(error)
         except UnicodeDecodeError as error:
