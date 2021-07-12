@@ -197,7 +197,9 @@ class App:
         except UnicodeDecodeError as error:
           print(error)
 
-    device.disconnect()
+    if self.current_device == '_SERIAL_':
+      device.disconnect()
+
     time_taken = (perf_counter() - start_time)
     sampling_rate = sample_num / time_taken
     gui_queue.put('Sampling Rate: {} hz ::: Done!'.format(int(sampling_rate)))
