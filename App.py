@@ -3,7 +3,6 @@ from SocketCommands import SocketCommands
 from time import perf_counter
 import PySimpleGUI as sg
 import threading
-import datetime
 import queue
 import csv
 import re
@@ -190,7 +189,7 @@ class App:
               start_time = perf_counter()
             n += 1
             percent = n / sample_num * 100
-            self.csv_writer('data', n, data)
+            self.csv_writer('data.csv', n, data)
             if percent % 10 == 0:
               gui_queue.put('Saving to CSV file: {}% complete'.format(int(percent)))
         except OSError as error:
@@ -211,10 +210,7 @@ class App:
     sg.Popup(contents, title=title, keep_on_top=True, font=font)
 
   def csv_writer(self, filename, index, data):
-    current_date = datetime.datetime.now()
-    parse_date = current_date.strftime('%Y-%m-%d_%H:%M:%S')
-    new_filename = '{}_{}.csv'.format(filename, parse_date)
-    with open(new_filename, 'a') as f:
+    with open(filename, 'a') as f:
       write = csv.writer(f, delimiter=",", quoting=csv.QUOTE_NONE, escapechar=' ')
       write.writerow([index, re.sub(r"\s+", "", data)])
 
